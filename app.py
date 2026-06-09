@@ -1,14 +1,7 @@
-import os
-import math
-name="Disha"
+import os   # unused import
 
-print(name)
+def bad_function():
+print("Bad indentation")   # indentation error
 
-print = "This breaks the print function"
-user_greeting = f"Hello {username}"
-
-return user_greeting
-
-print("This will never run")
-
-
+def unused_function(x, y):
+    return x + y   # unused function
