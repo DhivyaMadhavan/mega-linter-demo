@@ -26,8 +26,14 @@ jobs:
         run: |
           docker run -v "${{ github.workspace }}:/tmp/lint" \
             -e OUTPUT_FORMAT=rdjson \
-            -e OUTPUT_FOLDER=/tmp/lint/mega-reports \
+            -e OUTPUT_FOLDER=mega-reports \
             oxsecurity/megalinter-python:v8 || true
+
+          echo "===== RDJSON FILES ====="
+          find . -name "*.rdjson"
+        
+          echo "===== REPORT FILES ====="
+          find . -type f | grep report || true  
       
           if ls mega-reports/*.rdjson 1> /dev/null 2>&1; then
             echo "✅ MegaLinter reports found! Processing via Reviewdog..."
