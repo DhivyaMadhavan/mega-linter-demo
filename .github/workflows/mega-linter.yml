@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0 # Mega-Linter needs full history
 
       - name: Run Mega-Linter
-        uses: oxsecurity/megalinter/flavors/all@v8
+        uses: oxsecurity/megalinter@v9
         env:
           # Use the .mega-linter.yml config
           VALIDATE_ALL_CODEBASE: false
