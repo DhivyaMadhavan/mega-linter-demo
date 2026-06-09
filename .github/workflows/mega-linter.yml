@@ -26,7 +26,8 @@ jobs:
         run: |
           docker run -v "${{ github.workspace }}:/tmp/lint" \
             -e OUTPUT_FORMAT=rdjson \
-            -e OUTPUT_FOLDER=mega-reports \
+            -e OUTPUT_FOLDER=/tmp/lint/mega-reports \
+            -e ENABLE=PYTHON \
             oxsecurity/megalinter-python:v8 || true
 
           echo "===== RDJSON FILES ====="
