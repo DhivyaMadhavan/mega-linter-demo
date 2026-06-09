@@ -1,14 +1,10 @@
-import os
-import math
-name="Disha"
+# app.py (test version)
 
-print(name)
+import json
+import os   
 
-print = "This breaks the print function"
-user_greeting = f"Hello {username}"
+def bad_function():
+print("This line has bad indentation")   
 
-return user_greeting
-
-print("This will never run")
-
-
+def unused_function(x, y):
+    return x + y   
