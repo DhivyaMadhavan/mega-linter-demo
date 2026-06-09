@@ -37,7 +37,7 @@ jobs:
               cat "$report" | reviewdog -f=rdjson \
                 -name="Universal Linter (PR Review)" \
                 -reporter=github-pr-review \
-                -filter-mode=file \
+                -filter-mode=nofilter \
                 -level=warning
       
               # Reporter 2: Status check summary
