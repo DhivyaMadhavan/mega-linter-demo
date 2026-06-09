@@ -1,60 +1,32 @@
-name: Universal MegaLinter
-
-on:
-  pull_request:
-
-permissions:
-  contents: read
-  pull-requests: write
-  checks: write
+name: Mega-Linter + Reviewdog
+on: [pull_request]
 
 jobs:
-  lint:
+  lint-and-review:
+    name: Lint & Post Reviews
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Required for reviewdog to post comments
+    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # Mega-Linter needs full history
+
+      - name: Run Mega-Linter
+        uses: oxsecurity/megalinter/flavors/all@v8
+        env:
+          # Use the .mega-linter.yml config
+          VALIDATE_ALL_CODEBASE: false
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup reviewdog
-        uses: reviewdog/action-setup@v1.3.0
+        uses: reviewdog/action-setup@v1
 
-      - name: Run MegaLinter + Reviewdog
+      - name: Run reviewdog on Mega-Linter Reports
         env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REVIEWDOG_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          docker run -v "${{ github.workspace }}:/tmp/lint" \
-            -e OUTPUT_FORMAT=rdjson \
-            -e OUTPUT_FOLDER=/tmp/lint/mega-reports \
-            -e ENABLE=PYTHON \
-            oxsecurity/megalinter-python:v8 || true
-
-          echo "===== RDJSON FILES ====="
-          find . -name "*.rdjson"
-        
-          echo "===== REPORT FILES ====="
-          find . -type f | grep report || true  
-      
-          if ls mega-reports/*.rdjson 1> /dev/null 2>&1; then
-            echo "✅ MegaLinter reports found! Processing via Reviewdog..."
-            
-            for report in mega-reports/*.rdjson; do
-              # Reporter 1: Inline PR review comments
-              cat "$report" | reviewdog -f=rdjson \
-                -name="Universal Linter (PR Review)" \
-                -reporter=github-pr-review \
-                -filter-mode=nofilter \
-                -level=warning
-      
-              # Reporter 2: Status check summary
-              cat "$report" | reviewdog -f=rdjson \
-                -name="Universal Linter (Check Summary)" \
-                -reporter=github-check \
-                -filter-mode=file \
-                -level=warning
-            done
-          else
-            echo "⚠️ No rdjson reports located in mega-reports/ workspace folder."
-          fi
-
+          reviewdog -conf=.reviewdog.yml -reporter=github-pr-review
